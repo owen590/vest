@@ -8,26 +8,65 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 12px; }
         
-        .container { max-width: 900px; margin: 0 auto; }
+        .container { max-width: 600px; margin: 0 auto; }
         h1 { color: #333; margin-bottom: 16px; font-size: 20px; }
         
-        .card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-        .header h1 { margin: 0; }
-        
         .btn { background: #667eea; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; }
         .btn:hover { background: #5568d3; }
-        .btn-green { background: #11998e; }
-        .btn-red { background: #eb3349; }
-        .btn-sm { padding: 6px 10px; font-size: 12px; }
         
         /* Stats */
         .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
         .stat { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 8px; border-radius: 10px; text-align: center; }
         .stat.green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
         .stat.red { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); }
-        .stat-value { font-size: 20px; font-weight: bold; }
+        .stat-value { font-size: 18px; font-weight: bold; }
         .stat-label { font-size: 11px; opacity: 0.9; margin-top: 2px; }
+        
+        /* Cards */
+        .cards { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        
+        .card { 
+            background: white; border-radius: 12px; padding: 16px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: relative;
+        }
+        
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .card-symbol { font-size: 20px; font-weight: 700; color: #333; }
+        .card-side { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+        .card-side.LONG { background: #e6f7ff; color: #1890ff; }
+        .card-side.SHORT { background: #fff1f0; color: #ff4d4f; }
+        
+        .card-status { 
+            position: absolute; top: 12px; right: 12px; padding: 4px 10px; 
+            border-radius: 6px; font-size: 11px; 
+        }
+        .card-status.PLANNING { background: #f5f5f5; color: #666; }
+        .card-status.OPEN { background: #fff7e6; color: #fa8c16; }
+        .card-status.CLOSED { background: #f6ffed; color: #52c41a; }
+        
+        .card-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+        .card-row:last-child { border-bottom: none; }
+        .card-label { color: #999; }
+        .card-value { font-weight: 500; color: #333; }
+        
+        .card-pnl { 
+            margin-top: 12px; padding: 10px; border-radius: 8px; text-align: center; font-size: 16px; font-weight: 600; 
+        }
+        .card-pnl.positive { background: #f6ffed; color: #52c41a; }
+        .card-pnl.negative { background: #fff1f0; color: #ff4d4f; }
+        
+        .card-logic { 
+            margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 8px; font-size: 12px; color: #666; 
+        }
+        
+        .card-actions { 
+            display: flex; gap: 8px; margin-top: 12px; 
+        }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+        .btn-red { background: #eb3349; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        
+        .empty { text-align: center; color: #999; padding: 40px; font-size: 14px; }
         
         /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 100; overflow-y: auto; }
@@ -43,42 +82,6 @@
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
         .btn-cancel { background: #999; }
-        
-        /* Table - Responsive */
-        .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #eee; font-size: 13px; }
-        th { color: #666; font-weight: 500; font-size: 10px; text-transform: uppercase; white-space: nowrap; }
-        
-        .symbol { font-weight: 600; color: #333; font-size: 14px; }
-        .side { padding: 3px 8px; border-radius: 4px; font-size: 11px; display: inline-block; }
-        .side.LONG { background: #e6f7ff; color: #1890ff; }
-        .side.SHORT { background: #fff1f0; color: #ff4d4f; }
-        .status { padding: 3px 8px; border-radius: 4px; font-size: 11px; }
-        .status.PLANNING { background: #f5f5f5; color: #666; }
-        .status.OPEN { background: #fff7e6; color: #fa8c16; }
-        .status.CLOSED { background: #f6ffed; color: #52c41a; }
-        .pnl { font-weight: 600; }
-        .pnl.positive { color: #52c41a; }
-        .pnl.negative { color: #ff4d4f; }
-        
-        .logic, .journal { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; color: #666; }
-        .action-btns { display: flex; gap: 4px; white-space: nowrap; }
-        
-        .empty { text-align: center; color: #999; padding: 30px; font-size: 14px; }
-        
-        /* Mobile Responsive */
-        @media (max-width: 600px) {
-            body { padding: 8px; }
-            h1 { font-size: 18px; }
-            .stats { grid-template-columns: 1fr; gap: 8px; }
-            .stat { padding: 10px; }
-            .stat-value { font-size: 18px; }
-            .card { padding: 12px; margin-bottom: 8px; }
-            .form-row { grid-template-columns: 1fr; }
-            .modal-content { margin: 10px; padding: 16px; }
-            table { min-width: 500px; }
-        }
     </style>
 </head>
 <body>
@@ -103,20 +106,8 @@
             </div>
         </div>
         
-        <div class="card">
-            <div class="table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>股票</th><th>方向</th><th>状态</th><th>买入逻辑</th><th>目标/止损</th>
-                            <th>入场</th><th>出场</th><th>盈亏</th><th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tradeList"></tbody>
-                </table>
-            </div>
-            <div class="empty" id="emptyState">暂无交易记录</div>
-        </div>
+        <div class="cards" id="cards"></div>
+        <div class="empty" id="emptyState">暂无交易记录</div>
     </div>
 
     <div class="modal" id="modal">
@@ -147,7 +138,7 @@
                 </div>
                 <div class="form-group">
                     <label>买入逻辑</label>
-                    <textarea id="planBuyLogic" placeholder="为什么买入？你的交易逻辑..."></textarea>
+                    <textarea id="planBuyLogic" placeholder="为什么买入？交易逻辑..."></textarea>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
@@ -232,7 +223,6 @@
         
         document.getElementById('tradeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const tradeId = document.getElementById('tradeId').value;
             const data = {
                 symbol: document.getElementById('symbol').value.toUpperCase(),
@@ -256,10 +246,7 @@
                 body: JSON.stringify(data)
             });
             
-            if (res.ok) {
-                closeModal();
-                loadData();
-            }
+            if (res.ok) { closeModal(); loadData(); }
         });
         
         async function deleteTrade(id) {
@@ -280,13 +267,12 @@
                 
                 document.getElementById('totalTrades').textContent = stats.stats.reduce((s, r) => s + r.total, 0);
                 document.getElementById('openPositions').textContent = stats.stats.reduce((s, r) => s + r.open_pos, 0);
-                
                 const totalPnl = stats.stats.reduce((s, r) => s + (r.total_pnl || 0), 0);
                 document.getElementById('totalPnl').textContent = '$' + totalPnl.toFixed(0);
                 document.getElementById('totalPnlStat').className = totalPnl >= 0 ? 'stat green' : 'stat red';
                 
-                const tbody = document.getElementById('tradeList');
-                tbody.innerHTML = '';
+                const container = document.getElementById('cards');
+                container.innerHTML = '';
                 
                 if (trades.trades.length === 0) {
                     document.getElementById('emptyState').style.display = 'block';
@@ -295,29 +281,53 @@
                     trades.trades.forEach(trade => {
                         const pnl = trade.net_pnl ? (trade.net_pnl >= 0 ? '+' : '') + '$' + trade.net_pnl.toFixed(0) : '-';
                         const pnlClass = trade.net_pnl > 0 ? 'positive' : (trade.net_pnl < 0 ? 'negative' : '');
-                        const targetStop = [trade.target_price ? '目标:' + trade.target_price : '', trade.stop_loss ? '损:' + trade.stop_loss : ''].filter(Boolean).join(' ');
+                        const statusText = {'PLANNING': '计划', 'OPEN': '持仓', 'CLOSED': '平仓'}[trade.status];
+                        const sideText = trade.side === 'LONG' ? '做多' : '做空';
                         
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td class="symbol">$${trade.symbol}</td>
-                            <td><span class="side ${trade.side}">${trade.side === 'LONG' ? '多' : '空'}</span></td>
-                            <td><span class="status ${trade.status}">${trade.status === 'PLANNING' ? '计划' : trade.status === 'OPEN' ? '持仓' : '平仓'}</span></td>
-                            <td class="logic" title="${trade.plan_buy_logic || ''}">${trade.plan_buy_logic || '-'}</td>
-                            <td style="font-size:11px;">${targetStop || '-'}</td>
-                            <td>${trade.entry_price ? '$' + trade.entry_price : '-'}</td>
-                            <td>${trade.exit_price ? '$' + trade.exit_price : '-'}</td>
-                            <td class="pnl ${pnlClass}">${pnl}</td>
-                            <td class="action-btns">
+                        let pnlHTML = '';
+                        if (trade.status === 'CLOSED') {
+                            pnlHTML = `<div class="card-pnl ${pnlClass}">盈亏 ${pnl}</div>`;
+                        } else if (trade.status === 'OPEN' && trade.target_price) {
+                            pnlHTML = `<div class="card-pnl" style="background:#f5f5f5;color:#666">目标 $${trade.target_price}</div>`;
+                        }
+                        
+                        const logicHTML = trade.plan_buy_logic ? `<div class="card-logic">📝 ${trade.plan_buy_logic}</div>` : '';
+                        
+                        const card = document.createElement('div');
+                        card.className = 'card';
+                        card.innerHTML = `
+                            <div class="card-header">
+                                <span class="card-symbol">$${trade.symbol}</span>
+                                <span class="card-side ${trade.side}">${sideText}</span>
+                                <span class="card-status ${trade.status}">${statusText}</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">入场价</span>
+                                <span class="card-value">${trade.entry_price ? '$' + trade.entry_price : '-'}</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">数量</span>
+                                <span class="card-value">${trade.quantity || '-'}</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">出场价</span>
+                                <span class="card-value">${trade.exit_price ? '$' + trade.exit_price : '-'}</span>
+                            </div>
+                            <div class="card-row">
+                                <span class="card-label">目标/止损</span>
+                                <span class="card-value">${trade.target_price ? '$' + trade.target_price : '-'}/${trade.stop_loss ? '$' + trade.stop_loss : '-'}</span>
+                            </div>
+                            ${pnlHTML}
+                            ${logicHTML}
+                            <div class="card-actions">
                                 <button class="btn btn-sm" onclick='openModal(${JSON.stringify(trade).replace(/'/g, "&#39;")})'>编辑</button>
-                                <button class="btn btn-sm btn-red" onclick="deleteTrade(${trade.id})">删</button>
-                            </td>
+                                <button class="btn-red btn-sm" onclick="deleteTrade(${trade.id})">删除</button>
+                            </div>
                         `;
-                        tbody.appendChild(row);
+                        container.appendChild(card);
                     });
                 }
-            } catch (e) {
-                console.error(e);
-            }
+            } catch (e) { console.error(e); }
         }
         
         loadData();
