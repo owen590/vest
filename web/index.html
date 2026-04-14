@@ -1,181 +1,101 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html langzh-CN>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vest - 美股交易记录</title>
+    <meta charset=UTF-8>
+    <meta name=viewport content=width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no>
+    <title>Vest - 智能美股交易管家</title>
+    <link rel=preconnect href=https://fonts.googleapis.com>
+    <link rel=preconnect href=https://fonts.gstatic.com crossorigin>
+    <link href=https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Outfit:wght@300;400;500;600&display=swap rel=stylesheet>
+    <script src=https://cdn.tailwindcss.com></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'Geist', 'system-ui'], },
+                    colors: { accent: { 50: '#f0f7ff', 100: '#e0edff', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' } }
+                }
+            }
+        }
+    </script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; padding: 12px; }
-        
-        .container { max-width: 600px; margin: 0 auto; }
-        h1 { color: #333; margin-bottom: 16px; font-size: 20px; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
-        .btn { background: #667eea; color: white; border: none; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; }
-        .btn:hover { background: #5568d3; }
-        
-        /* Stats */
-        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-        .stat { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 8px; border-radius: 10px; text-align: center; }
-        .stat.green { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
-        .stat.red { background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); }
-        .stat-value { font-size: 18px; font-weight: bold; }
-        .stat-label { font-size: 11px; opacity: 0.9; margin-top: 2px; }
-        
-        /* Cards */
-        .cards { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        
-        .card { 
-            background: white; border-radius: 12px; padding: 16px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: relative;
-        }
-        
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .card-symbol { font-size: 20px; font-weight: 700; color: #333; }
-        .card-side { padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500; }
-        .card-side.LONG { background: #e6f7ff; color: #1890ff; }
-        .card-side.SHORT { background: #fff1f0; color: #ff4d4f; }
-        
-        .card-status { 
-            position: absolute; top: 12px; right: 12px; padding: 4px 10px; 
-            border-radius: 6px; font-size: 11px; 
-        }
-        .card-status.PLANNING { background: #f5f5f5; color: #666; }
-        .card-status.OPEN { background: #fff7e6; color: #fa8c16; }
-        .card-status.CLOSED { background: #f6ffed; color: #52c41a; }
-        
-        .card-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
-        .card-row:last-child { border-bottom: none; }
-        .card-label { color: #999; }
-        .card-value { font-weight: 500; color: #333; }
-        
-        .card-pnl { 
-            margin-top: 12px; padding: 10px; border-radius: 8px; text-align: center; font-size: 16px; font-weight: 600; 
-        }
-        .card-pnl.positive { background: #f6ffed; color: #52c41a; }
-        .card-pnl.negative { background: #fff1f0; color: #ff4d4f; }
-        
-        .card-logic { 
-            margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 8px; font-size: 12px; color: #666; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-height: 36px;
-        }
-        
-        .card-actions { 
-            display: flex; gap: 8px; margin-top: 12px; 
-        }
-        .btn-sm { padding: 6px 12px; font-size: 12px; }
-        .btn-red { background: #eb3349; color: white; border: none; border-radius: 6px; cursor: pointer; }
-        
-        .empty { text-align: center; color: #999; padding: 40px; font-size: 14px; }
-        
-        /* Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 100; overflow-y: auto; }
-        .modal.active { display: block; }
-        .modal-content { background: white; margin: 20px auto; border-radius: 12px; padding: 20px; width: 95%; max-width: 500px; }
-        .modal h2 { margin-bottom: 16px; font-size: 18px; }
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; margin-bottom: 4px; font-size: 13px; color: #666; }
-        .form-group input, .form-group select, .form-group textarea { 
-            width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px; 
-        }
-        .form-group textarea { min-height: 70px; }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .form-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
-        .btn-cancel { background: #999; }
+        * { -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Outfit', sans-serif; background: #0a0a0b; color: #fafafa; }
+        .glass { background: rgba(255,255,255,0.03); backdrop-blur: 20px; border: 1px solid rgba(255,255,255,0.06); }
+        .card-glow { position: relative; overflow: hidden; }
+        .card-glow::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 0%, rgba(59,130,246,0.15) 0%, transparent 60%); opacity: 0; transition: opacity 0.3s; }
+        .card-glow:hover::before { opacity: 1; }
+        .number-flow { font-variant-numeric: tabular-nums; }
+        .pulse-dot { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .slide-up { animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>📈 Vest 交易记录</h1>
-            <button class="btn" onclick="openModal()">+ 新增</button>
-        </div>
-        
-        <div class="stats" id="stats">
-            <div class="stat">
-                <div class="stat-value" id="totalTrades">-</div>
-                <div class="stat-label">总交易</div>
+<body class=min-h-screen>
+    <div class=container max-w-2xl mx-auto px-4 py-6>
+        <!-- Header -->
+        <header class=flex justify-between items-center mb-8>
+            <div>
+                <h1 class=text-2xl font-bold tracking-tight>Vest</h1>
+                <p class=text-sm text-gray-500>智能美股交易管家</p>
             </div>
-            <div class="stat green">
-                <div class="stat-value" id="openPositions">-</div>
-                <div class="stat-label">持仓</div>
-            </div>
-            <div class="stat" id="totalPnlStat">
-                <div class="stat-value" id="totalPnl">-</div>
-                <div class="stat-label">总盈亏</div>
-            </div>
-        </div>
-        
-        <div class="cards" id="cards"></div>
-        <div class="empty" id="emptyState">暂无交易记录</div>
-    </div>
+            <button onclick=openModal() class=\"bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-xl font-medium transition-all hover:scale-[0.98]\">+ 新增</button>
+        </header>
 
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <h2 id="modalTitle">新增交易</h2>
-            <form id="tradeForm">
-                <input type="hidden" id="tradeId">
-                <div class="form-group">
-                    <label>股票代码 *</label>
-                    <input type="text" id="symbol" placeholder="如 NVDA" required>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>方向</label>
-                        <select id="side">
-                            <option value="LONG">做多</option>
-                            <option value="SHORT">做空</option>
-                        </select>
+        <!-- Stats -->
+        <div class=\"grid grid-cols-3 gap-3 mb-6\">
+            <div class=\"glass rounded-2xl p-4 text-center slide-up style=\"animation-delay:0ms\"\">
+                <div class=\"text-2xl font-bold number-flow\" id=totalTrades>-</div>
+                <div class=\"text-xs text-gray-500 mt-1\">总交易</div>
+            </div>
+            <div class=\"glass rounded-2xl p-4 text-center slide-up style=\"animation-delay:50ms\" style=background:linear-gradient(135deg,rgba(16,185,129,0.2),rgba(34,197,94,0.1))>
+                <div class=\"text-2xl font-bold number-flow\" id=openPositions>-</div>
+                <div class=\"text-xs text-gray-500 mt-1\">持仓</div>
+            </div>
+            <div class=\"glass rounded-2xl p-4 text-center slide-up style=\"animation-delay:100ms\" id=totalPnlStat>
+                <div class=\"text-2xl font-bold number-flow\" id=totalPnl>-</div>
+                <div class=\"text-xs text-gray-500 mt-1\">总盈亏</div>
+            </div>
+        </div>
+
+        <!-- Cards -->
+        <div class=\"space-y-3\" id=cards></div>
+        <div class=\"empty text-center text-gray-600 py-12\" id=emptyState>暂无交易记录</div>
+
+        <!-- Modal -->
+        <div class=\"modal fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden overflow-y-auto\" id=modal>
+            <div class=\"glass rounded-3xl p-6 mx-4 my-8 max-w-lg\">
+                <h2 class=\"text-xl font-semibold mb-5\" id=modalTitle>新增交易</h2>
+                <form id=tradeForm>
+                    <input type=hidden id=tradeId>
+                    <div class=\"space-y-4\">
+                        <div><label class=\"block text-sm text-gray-400 mb-1\">股票代码</label><input type=text id=symbol class=\"w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-accent-500\" placeholder=NVDA required></div>
+                        <div class=\"grid grid-cols-2 gap-3\">
+                            <div><label class=\"block text-sm text-gray-400 mb-1\">方向</label><select id=side class=\"w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none\"><option value=LONG>做多</option><option value=SHORT>做空</option></select></div>
+                            <div><label class=\"block text-sm text-gray-400 mb-1\">状态</label><select id=status class=\"w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none\"><option value=PLANNING>计划中</option><option value=OPEN>持仓中</option><option value=CLOSED>已平仓</option></select></div>
+                        </div>
+                        <div><label class=\"block text-sm text-gray-400 mb-1\">买入逻辑</label><textarea id=planBuyLogic class=\"w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none focus:border-accent-500 h-20\" placeholder=为什么买入?></textarea></div>
+                        <div class=\"grid grid-cols-2 gap-3\">
+                            <div><label class=\"block text-sm text-gray-400 mb-1\">目标价</label><input type=number step=0.01 id=targetPrice class=\"w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none\"></div>
+                            <div><label class=\"block text-sm text-gray-400 mb-1\">止损价</label><input type=number step=0.01 id=stopLoss class=\"w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none\"></div>
+                        </div>
+                        <div class=\"grid grid-cols-2 gap-3 exec-fields\" style=display:none>
+                            <div><label class=\"block text-sm text-gray-400 mb-1\">入场价</label><input type=number step=0.01 id=entryPrice class=\"w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none\"></div>
+                            <div><label class=\"block text-sm text-gray-400 mb-1\">数量</label><input type=number id=quantity class=\"w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none\"></div>
+                        </div>
+                        <div class=\"grid grid-cols-2 gap-3 close-fields\" style=display:none>
+                            <div><label class=\"block text-sm text-gray-400 mb-1\">出场价</label><input type=number step=0.01 id=exitPrice class=\"w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none\"></div>
+                        </div>
+                        <div class=\"journal-group\" style=display:none><label class=\"block text-sm text-gray-400 mb-1\">复盘</label><textarea id=journalContent class=\"w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:outline-none h-20\" placeholder=这笔交易做得如何?></textarea></div>
                     </div>
-                    <div class="form-group">
-                        <label>状态</label>
-                        <select id="status">
-                            <option value="PLANNING">计划中</option>
-                            <option value="OPEN">持仓中</option>
-                            <option value="CLOSED">已平仓</option>
-                        </select>
+                    <div class=\"flex gap-3 mt-6\">
+                        <button type=button onclick=closeModal() class=\"flex-1 py-3 rounded-xl bg-white/5 text-gray-400 hover:bg-white/10\">取消</button>
+                        <button type=submit class=\"flex-1 py-3 rounded-xl bg-accent-500 text-white font-medium hover:bg-accent-600\">保存</button>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>买入逻辑</label>
-                    <textarea id="planBuyLogic" placeholder="为什么买入？交易逻辑..."></textarea>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>目标价</label>
-                        <input type="number" step="0.01" id="targetPrice" placeholder="目标价">
-                    </div>
-                    <div class="form-group">
-                        <label>止损价</label>
-                        <input type="number" step="0.01" id="stopLoss" placeholder="止损价">
-                    </div>
-                </div>
-                <div class="form-row" id="execFields" style="display:none;">
-                    <div class="form-group">
-                        <label>入场价</label>
-                        <input type="number" step="0.01" id="entryPrice" placeholder="入场价">
-                    </div>
-                    <div class="form-group">
-                        <label>数量</label>
-                        <input type="number" id="quantity" placeholder="股数">
-                    </div>
-                </div>
-                <div class="form-row" id="closeFields" style="display:none;">
-                    <div class="form-group">
-                        <label>出场价</label>
-                        <input type="number" step="0.01" id="exitPrice" placeholder="出场价">
-                    </div>
-                </div>
-                <div class="form-group" id="journalGroup" style="display:none;">
-                    <label>复盘内容</label>
-                    <textarea id="journalContent" placeholder="这笔交易做得如何？有什么教训？"></textarea>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-cancel" onclick="closeModal()">取消</button>
-                    <button type="submit" class="btn">保存</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 
@@ -183,12 +103,10 @@
         const API = 'http://' + window.location.hostname + '/api';
         
         function openModal(trade = null) {
-            const modal = document.getElementById('modal');
-            const form = document.getElementById('tradeForm');
-            const title = document.getElementById('modalTitle');
-            
+            const m = document.getElementById('modal');
+            const f = document.getElementById('tradeForm');
             if (trade) {
-                title.textContent = '编辑交易';
+                document.getElementById('modalTitle').textContent = '编辑交易';
                 document.getElementById('tradeId').value = trade.id;
                 document.getElementById('symbol').value = trade.symbol;
                 document.getElementById('side').value = trade.side;
@@ -200,31 +118,27 @@
                 document.getElementById('quantity').value = trade.quantity || '';
                 document.getElementById('exitPrice').value = trade.exit_price || '';
             } else {
-                title.textContent = '新增交易';
-                form.reset();
+                document.getElementById('modalTitle').textContent = '新增交易';
+                f.reset();
                 document.getElementById('tradeId').value = '';
             }
-            
             updateFieldsVisibility();
-            modal.classList.add('active');
+            m.classList.remove('hidden');
         }
         
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
-        }
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
         
         function updateFieldsVisibility() {
-            const status = document.getElementById('status').value;
-            document.getElementById('execFields').style.display = (status === 'OPEN' || status === 'CLOSED') ? 'grid' : 'none';
-            document.getElementById('closeFields').style.display = status === 'CLOSED' ? 'grid' : 'none';
-            document.getElementById('journalGroup').style.display = status === 'CLOSED' ? 'block' : 'none';
+            const s = document.getElementById('status').value;
+            document.querySelector('.exec-fields').style.display = (s === 'OPEN' || s === 'CLOSED') ? 'grid' : 'none';
+            document.querySelector('.close-fields').style.display = s === 'CLOSED' ? 'grid' : 'none';
+            document.querySelector('.journal-group').style.display = s === 'CLOSED' ? 'block' : 'none';
         }
-        
         document.getElementById('status').addEventListener('change', updateFieldsVisibility);
         
         document.getElementById('tradeForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const tradeId = document.getElementById('tradeId').value;
+            const id = document.getElementById('tradeId').value;
             const data = {
                 symbol: document.getElementById('symbol').value.toUpperCase(),
                 side: document.getElementById('side').value,
@@ -237,102 +151,70 @@
                 exit_price: parseFloat(document.getElementById('exitPrice').value) || null,
                 journal_content: document.getElementById('journalContent').value
             };
-            
-            const url = tradeId ? API + '/trades/' + tradeId : API + '/trades';
-            const method = tradeId ? 'PUT' : 'POST';
-            
-            const res = await fetch(url, {
-                method: method,
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            });
-            
-            if (res.ok) { closeModal(); loadData(); }
+            const url = id ? API + '/trades/' + id : API + '/trades';
+            const method = id ? 'PUT' : 'POST';
+            if ((await fetch(url, {method, headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)})).ok) { closeModal(); loadData(); }
         });
         
-        async function deleteTrade(id) {
-            if (!confirm('确定删除？')) return;
-            await fetch(API + '/trades/' + id, {method: 'DELETE'});
-            loadData();
-        }
+        async function deleteTrade(id) { if (confirm('确定删除?')) { await fetch(API + '/trades/' + id, {method: 'DELETE'}); loadData(); } }
         
         async function loadData() {
             try {
-                const [tradesRes, statsRes] = await Promise.all([
-                    fetch(API + '/trades'),
-                    fetch(API + '/stats')
-                ]);
-                
-                const trades = await tradesRes.json();
-                const stats = await statsRes.json();
+                const [tr, st] = await Promise.all([fetch(API + '/trades'), fetch(API + '/stats')]);
+                const trades = await tr.json();
+                const stats = await st.json();
                 
                 document.getElementById('totalTrades').textContent = stats.stats.reduce((s, r) => s + r.total, 0);
                 document.getElementById('openPositions').textContent = stats.stats.reduce((s, r) => s + r.open_pos, 0);
-                const totalPnl = stats.stats.reduce((s, r) => s + (r.total_pnl || 0), 0);
-                document.getElementById('totalPnl').textContent = '$' + totalPnl.toFixed(0);
-                document.getElementById('totalPnlStat').className = totalPnl >= 0 ? 'stat green' : 'stat red';
+                const tp = stats.stats.reduce((s, r) => s + (r.total_pnl || 0), 0);
+                document.getElementById('totalPnl').textContent = '$' + tp.toFixed(0);
+                const pnlStat = document.getElementById('totalPnlStat');
+                if (tp >= 0) { pnlStat.style.background = 'linear-gradient(135deg,rgba(16,185,129,0.2),rgba(34,197,94,0.1))'; pnlStat.querySelector('div').classList.replace('text-white', 'text-green-400'); }
+                else { pnlStat.style.background = 'linear-gradient(135deg,rgba(239,68,68,0.2),rgba(220,38,38,0.1))'; pnlStat.querySelector('div').classList.replace('text-white', 'text-red-400'); }
                 
-                const container = document.getElementById('cards');
-                container.innerHTML = '';
-                
-                if (trades.trades.length === 0) {
-                    document.getElementById('emptyState').style.display = 'block';
-                } else {
+                const c = document.getElementById('cards');
+                c.innerHTML = '';
+                if (trades.trades.length === 0) { document.getElementById('emptyState').style.display = 'block'; }
+                else {
                     document.getElementById('emptyState').style.display = 'none';
-                    trades.trades.forEach(trade => {
-                        const pnl = trade.net_pnl ? (trade.net_pnl >= 0 ? '+' : '') + '$' + trade.net_pnl.toFixed(0) : '-';
-                        const pnlClass = trade.net_pnl > 0 ? 'positive' : (trade.net_pnl < 0 ? 'negative' : '');
-                        const statusText = {'PLANNING': '计划', 'OPEN': '持仓', 'CLOSED': '平仓'}[trade.status];
-                        const sideText = trade.side === 'LONG' ? '做多' : '做空';
-                        
+                    trades.trades.forEach((t, i) => {
+                        const pnl = t.net_pnl ? (t.net_pnl >= 0 ? '+' : '') + '$' + t.net_pnl.toFixed(0) : '-';
+                        const pnlClz = t.net_pnl > 0 ? 'text-green-400' : (t.net_pnl < 0 ? 'text-red-400' : 'text-gray-400');
+                        const stTxt = {PLANNING: '计划', OPEN: '持仓', CLOSED: '平仓'}[t.status];
+                        const sdTxt = t.side === 'LONG' ? '多' : '空';
+                        const sdClz = t.side === 'LONG' ? 'bg-blue-500/20 text-blue-400' : 'bg-red-500/20 text-red-400';
+                        const stClz = t.status === 'OPEN' ? 'bg-yellow-500/20 text-yellow-400' : (t.status === 'CLOSED' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400');
+                        const logicHTML = t.plan_buy_logic ? `<div class=\"text-sm text-gray-500 mt-2 truncate\">📝 ${t.plan_buy_logic}</div>` : '';
+                        const journalHTML = t.journal_content ? `<div class=\"text-sm text-orange-400/80 mt-1 truncate\">💡 ${t.journal_content}</div>` : '';
                         let pnlHTML = '';
-                        if (trade.status === 'CLOSED') {
-                            pnlHTML = `<div class="card-pnl ${pnlClass}">盈亏 ${pnl}</div>`;
-                        } else if (trade.status === 'OPEN' && trade.target_price) {
-                            pnlHTML = `<div class="card-pnl" style="background:#f5f5f5;color:#666">目标 $${trade.target_price}</div>`;
-                        }
+                        if (t.status === 'CLOSED') pnlHTML = `<div class=\"mt-3 p-3 rounded-xl bg-gradient-to-r ${t.net_pnl >= 0 ? 'from-green-500/10 to-green-600/5' : 'from-red-500/10 to-red-600/5'}\"><span class=\"text-lg font-bold ${pnlClz}\">${pnl}</span></div>`;
+                        else if (t.status === 'OPEN' && t.target_price) pnlHTML = `<div class=\"mt-3 p-3 rounded-xl bg-white/5\"><span class=\"text-sm text-gray-400\">目标 $${t.target_price}</span></div>`;
                         
-                        const logicHTML = trade.plan_buy_logic ? `<div class="card-logic">📝 ${trade.plan_buy_logic}</div>` : '';
-                        const journalHTML = trade.journal_content ? `<div class="card-logic" style="background:#fff7e6;color:#fa8c16">💡 ${trade.journal_content.substring(0, 50)}${trade.journal_content.length > 50 ? '...' : ''}</div>` : '';
-                        
-                        const card = document.createElement('div');
-                        card.className = 'card';
-                        card.innerHTML = `
-                            <div class="card-header">
-                                <span class="card-symbol">$${trade.symbol}</span>
-                                <span class="card-side ${trade.side}">${sideText}</span>
-                                <span class="card-status ${trade.status}">${statusText}</span>
-                            </div>
-                            <div class="card-row">
-                                <span class="card-label">入场价</span>
-                                <span class="card-value">${trade.entry_price ? '$' + trade.entry_price : '-'}</span>
-                            </div>
-                            <div class="card-row">
-                                <span class="card-label">数量</span>
-                                <span class="card-value">${trade.quantity || '-'}</span>
-                            </div>
-                            <div class="card-row">
-                                <span class="card-label">出场价</span>
-                                <span class="card-value">${trade.exit_price ? '$' + trade.exit_price : '-'}</span>
-                            </div>
-                            <div class="card-row">
-                                <span class="card-label">目标/止损</span>
-                                <span class="card-value">${trade.target_price ? '$' + trade.target_price : '-'}/${trade.stop_loss ? '$' + trade.stop_loss : '-'}</span>
-                            </div>
-                            ${logicHTML}
-                            ${journalHTML}
-                            ${pnlHTML}
-                            <div class="card-actions">
-                                <button class="btn btn-sm" onclick='openModal(${JSON.stringify(trade).replace(/'/g, "&#39;")})'>编辑</button>
-                                <button class="btn-red btn-sm" onclick="deleteTrade(${trade.id})">删除</button>
-                            </div>
-                        `;
-                        container.appendChild(card);
+                        c.innerHTML += `
+                            <div class=\"glass rounded-2xl p-4 card-glow slide-up\" style=\"animation-delay:${i*50}ms\">
+                                <div class=\"flex justify-between items-start\">
+                                    <div>
+                                        <span class=\"text-xl font-bold\">$${t.symbol}</span>
+                                        <span class=\"ml-2 px-2 py-0.5 rounded text-xs ${sdClz}\">${sdTxt}</span>
+                                        <span class=\"ml-2 px-2 py-0.5 rounded text-xs ${stClz}\">${stTxt}</span>
+                                    </div>
+                                </div>
+                                <div class=\"grid grid-cols-3 gap-2 mt-3 text-sm\">
+                                    <div><span class=\"text-gray-500\">入场</span><div class=\"text-white\">${t.entry_price ? '$'+t.entry_price : '-'}</div></div>
+                                    <div><span class=\"text-gray-500\">数量</span><div class=\"text-white\">${t.quantity || '-'}</div></div>
+                                    <div><span class=\"text-gray-500\">出场</span><div class=\"text-white\">${t.exit_price ? '$'+t.exit_price : '-'}</div></div>
+                                </div>
+                                ${logicHTML}${journalHTML}
+                                ${pnlHTML}
+                                <div class=\"flex gap-2 mt-3 pt-3 border-t border-white/5\">
+                                    <button class=\"flex-1 py-2 rounded-lg bg-white/5 text-sm hover:bg-white/10\" onclick='openModal(${JSON.stringify(t).replace(/'/g,'&#39;')})'>编辑</button>
+                                    <button class=\"flex-1 py-2 rounded-lg bg-red-500/10 text-red-400 text-sm hover:bg-red-500/20\" onclick=\"deleteTrade(${t.id})\">删除</button>
+                                </div>
+                            </div>`;
                     });
                 }
-            } catch (e) { console.error(e); }
+            } catch(e) { console.error(e); }
         }
-        
         loadData();
         setInterval(loadData, 10000);
     </script>
