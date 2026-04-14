@@ -24,7 +24,12 @@ class VestHandler(BaseHTTPRequestHandler):
         c = conn.cursor()
         
         if path == '/api/trades':
-            c.execute("SELECT * FROM trades ORDER BY created_at DESC")
+            # Join with journals to get latest journal content
+            c.execute('''SELECT t.*, j.content as journal_content 
+                         FROM trades t 
+                         LEFT JOIN (SELECT trade_id, content FROM journals ORDER BY created_at DESC) j 
+                         ON t.id = j.trade_id 
+                         ORDER BY t.created_at DESC''')
             rows = [dict(r) for r in c.fetchall()]
             conn.close()
             self.send_response(200)

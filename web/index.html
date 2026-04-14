@@ -58,6 +58,7 @@
         
         .card-logic { 
             margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 8px; font-size: 12px; color: #666; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-height: 36px;
         }
         
         .card-actions { 
@@ -292,6 +293,7 @@
                         }
                         
                         const logicHTML = trade.plan_buy_logic ? `<div class="card-logic">📝 ${trade.plan_buy_logic}</div>` : '';
+                        const journalHTML = trade.journal_content ? `<div class="card-logic" style="background:#fff7e6;color:#fa8c16">💡 ${trade.journal_content.substring(0, 50)}${trade.journal_content.length > 50 ? '...' : ''}</div>` : '';
                         
                         const card = document.createElement('div');
                         card.className = 'card';
@@ -317,8 +319,9 @@
                                 <span class="card-label">目标/止损</span>
                                 <span class="card-value">${trade.target_price ? '$' + trade.target_price : '-'}/${trade.stop_loss ? '$' + trade.stop_loss : '-'}</span>
                             </div>
-                            ${pnlHTML}
                             ${logicHTML}
+                            ${journalHTML}
+                            ${pnlHTML}
                             <div class="card-actions">
                                 <button class="btn btn-sm" onclick='openModal(${JSON.stringify(trade).replace(/'/g, "&#39;")})'>编辑</button>
                                 <button class="btn-red btn-sm" onclick="deleteTrade(${trade.id})">删除</button>
