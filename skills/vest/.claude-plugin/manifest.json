@@ -1,0 +1,7 @@
+{
+  "schema_version": "1",
+  "name": "vest",
+  "description": "AI美股交易记录助手 - 投前/投中/投后全流程记录",
+  "trigger": ["/vest", "买入", "持仓", "平仓", "统计"],
+  "version": "1.0.0"
+}
